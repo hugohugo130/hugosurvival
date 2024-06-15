@@ -12,7 +12,7 @@ if result == 1:
     quit()
 
 key = b"hhhuuugggooo111333000hugohugohugoeeeeeeeeee="
-cipher_suite = Fernet(key)
+cs = Fernet(key)
 filename = "game"
 
 game = Tk(className="survival game")
@@ -44,12 +44,12 @@ def savefile(content, cs, filename):
 
 
 def saveall():
-    savefile(hp, cipher_suite, "hp")
-    savefile(tick, cipher_suite, "tick")
+    savefile(hp, cs, "hp")
+    savefile(tick, cs, "tick")
     plrinfo = player.name + "|" + "-".join(player.backpack) + "." + str(player.hunger)
-    savefile(plrinfo, cipher_suite, "playerinfo")
-    savefile(coins, cipher_suite, "coins")
-    savefile(add_hp_0_5, cipher_suite, "addhpcache")
+    savefile(plrinfo, cs, "playerinfo")
+    savefile(coins, cs, "coins")
+    savefile(add_hp_0_5, cs, "addhpcache")
 
 
 def saveexit():
@@ -93,10 +93,10 @@ def refresh():
     player.hunger = hunger
 
 try:
-    hp = int(readfile(cipher_suite, "hp"))
-    tick = int(readfile(cipher_suite, "tick"))
-    coins = int(readfile(cipher_suite, "coins"))
-    add_hp_0_5 = int(readfile(cipher_suite,"addhpcache"))
+    hp = int(readfile(cs, "hp"))
+    tick = int(readfile(cs, "tick"))
+    coins = int(readfile(cs, "coins"))
+    add_hp_0_5 = int(readfile(cs,"addhpcache"))
 except Exception as err:
     if "ValueError" in err:
         quit("data數據出錯,解決辦法: 刪掉txt\n {err}")
@@ -183,7 +183,7 @@ class Player:
 
 
 player = Player(hp, None)
-playerinfo = readfile(cipher_suite, "playerinfo")
+playerinfo = readfile(cs, "playerinfo")
 player.name = playerinfo.split("|")[0]
 if len(playerinfo) > 1:
     player.backpack = playerinfo.split("|")[1].split(".")[0].split("-")
