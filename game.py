@@ -293,6 +293,7 @@ def eat_food():
     if foodcount > 0 and plrhunger < 20:
         plrbackpack.remove("food")
         hunger += 1
+        refresh_()
         plrfoodcount = player.backpack.count("food")
         print(
             f"{player.name} 吃了一個食物. 現在他有 {plrfoodcount} 個食物. 他的飢餓值: {player.hunger}"
