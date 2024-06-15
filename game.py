@@ -88,12 +88,11 @@ while True:
             pwwrongtime += 1
             print(f"密碼錯誤, 錯誤次數:{pwwrongtime}, 剩下 {maxwrongtime - pwwrongtime} 次機會")
 
-game = Tk(className="survival game")
+game = Tk(className="生存遊戲")
 game.geometry("400x300")
 
 def refresh():
     global hplbl, ticklbl, player, hungerlbl, foodslbl, healthslbl, swordslbl, coinslbl
-    hplbl.config(text=f"HP: {hp}")
     # mins = int((tick - (tick%20)) / 20)
     mins = int(tick * 0.06)
     hours = 0
@@ -113,12 +112,13 @@ def refresh():
     foods = player.backpack.count("food")
     healths = player.backpack.count("health")
     swords = player.backpack.count("sword")
-    ticklbl.config(text=f"Day {days} {hours}:{mins} ({tick} tick)")
-    hungerlbl.config(text=f"Hunger: {hunger} / 20")
-    foodslbl.config(text=f"Foods: {foods}")
-    healthslbl.config(text=f"Healths: {healths}")
-    swordslbl.config(text=f"Swords: {swords}")
-    coinslbl.config(text=f"Coins: {coins}")
+    hplbl.config(text=f"生命值: {hp}")
+    ticklbl.config(text=f"第 {days} 天 {hours}:{mins} ({tick} tick)")
+    hungerlbl.config(text=f"飢餓值: {hunger} / 20")
+    foodslbl.config(text=f"食物: {foods}")
+    healthslbl.config(text=f"回血加成: {healths}")
+    swordslbl.config(text=f"攻擊加成: {swords}")
+    coinslbl.config(text=f"金幣: {coins}")
     player.health = hp
     player.hunger = hunger
 
@@ -132,13 +132,14 @@ except Exception as err:
         quit("data數據出錯,解決辦法: 刪掉txt\n {err}")
     else:
         quit(err)
-hplbl = Label(game, text="HP: Loading")
-ticklbl = Label(game, text="Day -- --:-- (-- tick)")
-hungerlbl = Label(game, text="Hunger: -- / 20")
-foodslbl = Label(game, text="Foods: --")
-healthslbl = Label(game, text="Healths: --")
-swordslbl = Label(game, text="Swords: --")
-coinslbl = Label(game, text="Coins: --")
+
+hplbl = Label(game, text="生命值: Loading")
+ticklbl = Label(game, text="第 -- 天 --:-- (-- tick)")
+hungerlbl = Label(game, text="飢餓值: -- / 20")
+foodslbl = Label(game, text="食物: --")
+healthslbl = Label(game, text="回血加成: --")
+swordslbl = Label(game, text="攻擊加成: --")
+coinslbl = Label(game, text="金幣: --")
 hplbl.place(relx=0.5, rely=0.1, anchor="n")
 ticklbl.place(relx=0.5, rely=0.175, anchor="n")
 hungerlbl.place(relx=0.5, rely=0.250, anchor="n")
@@ -153,13 +154,13 @@ class monster:
         self.health = 10
         self.attackage = 1
         self.name = name
-        print(f"monster({self.name}) spawned!")
+        print(f"怪物{self.name} 生成了!")
 
     def attack(self, player):
         global hp,add_hp_0_5
         if self.health <= 0 and self in zombies:
             zombies.remove(self)
-            print(f"monster({self.name}) died!")
+            print(f"怪物{self.name} 死了!")
         else:
             # print(f"{self.name} want to attack {player.name}! -- monster attack function")
             mins = int(tick * 0.06)
@@ -173,22 +174,22 @@ class monster:
                 hours -= 24
             # print(f"the hour is {hours}")
             if (20 <= hours <= 24) or (0 <= hours <= 4):
-                print(f"{self.name} is attacking {player.name}!")
+                print(f"{self.name} 正在攻擊 {player.name}!")
                 hp -= self.attackage
-                print(f"{player.name}'s health - {self.attackage}")
+                print(f"{player.name}的生命值 - {self.attackage}")
                 plrsword = player.backpack.count("sword")
                 if plrsword > 0:
                     monster_health_reduce = 5 * plrsword
                     print(
-                        f"{player.name} used {plrsword} sword to attack monster({self.name}). monster health - {monster_health_reduce}"
+                        f"{player.name} 用了 {plrsword} 個劍去打怪物{self.name}. 怪物血量 - {monster_health_reduce}"
                     )
                     add_hp_0_5 += 1
-                    print("Add player 0.5 hp cache + 1")
+                    print("玩家的 0.5 hp + 1 (達到2個自動增加1生命值)")
                     if self.health - monster_health_reduce <= 0:
                         self.health = 0
                         if self in zombies:
                             zombies.remove(self)
-                            print(f"monster({self.name}) died!")
+                            print(f"怪物{self.name} 死了!")
                         del self
                     else:
                         self.health -= monster_health_reduce
@@ -218,10 +219,10 @@ player.name = playerinfo.split("|")[0]
 if len(playerinfo) > 1:
     player.backpack = playerinfo.split("|")[1].split(".")[0].split("-")
 hunger = int(playerinfo.split(".")[1])
-print(f"player({player.name}) spawned!")
-print(f"{player.name}'s backpack : {player.backpack}")
-print(f"{player.name}'s health: {player.health}")
-print(f"{player.name}'s hunger: {player.hunger}")
+print(f"玩家 {player.name} 生成了!")
+print(f"{player.name}的背包 : {player.backpack}")
+print(f"{player.name}的生命值: {player.health}")
+print(f"{player.name}的飢餓值: {player.hunger}")
 
 add_hp_0_5 = 0
 
@@ -231,7 +232,7 @@ def refresh_():
     if add_hp_0_5 >= 2:
         add_hp_0_5 -= 2
         hp += 1
-        print(f"{player.name}'s health + 1")
+        print(f"{player.name}的生命值 + 1")
     refresh()
     mins = int(tick * 0.06)
     hours = 0
@@ -253,12 +254,12 @@ def refresh_():
             # print(f"{randomonezombie.name} want to attack {player.name}!")
             randomonezombie.attack(player)
     if player.health == 0:
-        print("Ah! You're Died!")
+        print("你死了")
         hp = 100
-        print("You've revived!")
+        print("你復活了")
     if len(zombies) == 0 and not (4 <= hours < 20):
         for i in range(3):
-            exec(f"zombie{i} = monster('zombie{i}')")
+            exec(f"zombie{i} = 怪物zombie{i}")
             exec(f"zombies.append(zombie{i})")
     if tick % 100 == 0:
         if 4 < hours < 20 and hp < 100:
@@ -270,9 +271,9 @@ def refresh_():
                 hunger -= 1
                 addhp += 1
             hp += addhp
-            print(f"{player.name}'s health + {addhp}")
+            print(f"{player.name} 的生命值 + {addhp}")
     if hp > 100:
-        print(f"{player.name} too many hp ({hp}), set to max (100)")
+        print(f"{player.name} 太多生命值了 ({hp}), 設定成最大值 (100)")
         hp = 100
     game.after(50, refresh_)
 
@@ -281,7 +282,7 @@ def get_food():
     global player
     player.backpack.append("food")
     plrfoodcount = player.backpack.count("food")
-    print(f"{player.name} got 1 food. Now he has {plrfoodcount} food")
+    print(f"{player.name} 獲得了一個事物. 現在他有 {plrfoodcount} 個食物")
 
 
 def eat_food():
@@ -294,7 +295,7 @@ def eat_food():
         hunger += 1
         plrfoodcount = player.backpack.count("food")
         print(
-            f"{player.name} ate 1 food. Now he has {plrfoodcount} food. His hunger: {player.hunger}"
+            f"{player.name} 吃了一個食物. 現在他有 {plrfoodcount} 個食物. 他的飢餓值: {player.hunger}"
         )
 
 
@@ -318,13 +319,13 @@ def skip_night():
         tick += addtick
         reducehunger = randint(1, 5)
         hunger -= reducehunger
-        print(f"skipped night, hunger - {reducehunger}")
+        print(f"已跳過晚上, 飢餓值 - {reducehunger}")
 
 
 def get_coin():
     global coins
     coins += 1
-    print(f"coins + 1 (now coins: {coins})")
+    print(f"金幣 + 1 (擁有金幣: {coins})")
 
 
 def buy(obj):
@@ -334,13 +335,13 @@ def buy(obj):
             player.backpack.append("health")
             coins -= 5
         else:
-            print("5 coins = 1 health")
+            print("5個金幣 = 1個回血加成")
     elif obj == "s":
         if coins >= 5:
             player.backpack.append("sword")
             coins -= 5
         else:
-            print("5 coins = 1 sword")
+            print("5個金幣 = 1個攻擊加成")
 
 
 def buy_():
@@ -351,21 +352,22 @@ def buy__():
     buy("s")
 
 
-eat_food_btn = Button(game, text="eat food", command=eat_food)
-get_food_btn = Button(game, text="get food", command=get_food)
-skip_night_btn = Button(game, text="skip night", command=skip_night)
-buy_health_btn = Button(game, text="buy health", command=buy_)
-buy_sword_btn = Button(game, text="buy sword", command=buy__)
-get_coin_btn = Button(game, text="get coin", command=get_coin)
+eat_food_btn = Button(game, text="吃掉食物", command=eat_food)
+get_food_btn = Button(game, text="獲取食物", command=get_food)
+skip_night_btn = Button(game, text="跳過晚上", command=skip_night)
+buy_health_btn = Button(game, text="購買回血加成", command=buy_)
+buy_sword_btn = Button(game, text="購買攻擊加成", command=buy__)
+get_coin_btn = Button(game, text="獲取金幣", command=get_coin)
 eat_food_btn.place(relx=0.2, rely=0.1, anchor="ne")
 get_food_btn.place(relx=0.2, rely=0.2, anchor="ne")
 skip_night_btn.place(relx=0.2, rely=0.3, anchor="ne")
-buy_health_btn.place(relx=0.2, rely=0.4, anchor="ne")
-buy_sword_btn.place(relx=0.2, rely=0.5, anchor="ne")
+buy_health_btn.place(relx=0.22, rely=0.4, anchor="ne")
+buy_sword_btn.place(relx=0.22, rely=0.5, anchor="ne")
 get_coin_btn.place(relx=0.2, rely=0.6, anchor="ne")
 
 def opengamesettings():
     gamesettings = Toplevel(game)
+    gamesettings.title("遊戲設定")
     gamesettings.geometry("400x300")
     pwentry = Entry(gamesettings)
     pwentry.place(relx=0.1,rely=0.1,anchor='w')
