@@ -7,10 +7,10 @@ from random import choice as ranchoice, randint
 from module.check_file_update import cfu
 from time import sleep
 
-dev = False
+checkupdate = True
 
 result = cfu()
-if result == 1 and not dev:
+if result == 1 and checkupdate:
     print("檢測到更新!請執行game_file_updater_get.py去更新哦~")
     input("點擊Enter退出")
     quit()
