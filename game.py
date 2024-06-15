@@ -371,14 +371,14 @@ def opengamesettings():
     gamesettings.title("遊戲設定")
     gamesettings.geometry("400x300")
     pwentry = Entry(gamesettings)
-    pwentry.place(relx=0.1,rely=0.1,anchor='w')
+    pwentry.place(relx=0.05,rely=0.1,anchor='w')
     def getentry():
         global usersetpw
         usersetpw = pwentry.get()
         savefile(usersetpw,cs,"password")
         restart()
     pwsetbtn = Button(gamesettings,text="設定密碼 (會重啟) (留空清除密碼)",command=getentry)
-    pwsetbtn.place(relx=0.9,rely=0.1,anchor="e")
+    pwsetbtn.place(relx=0.95,rely=0.1,anchor="e")
 
 opengamesettings_btn = Button(game,text="打開遊戲設定",command=opengamesettings)
 opengamesettings_btn.place(relx=0.22,rely=0.7,anchor="ne")
