@@ -7,7 +7,7 @@ from module.check_file_update import cfu
 
 result = cfu()
 if result == 1:
-    print("已經有更新了!請打開game_file_updater_get.py更新!")
+    print("已經有更新了!請執行game_file_updater_get.py進行更新!")
     input("點擊Enter退出")
     quit()
 
