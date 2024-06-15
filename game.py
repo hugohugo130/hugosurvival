@@ -1,9 +1,11 @@
 from cryptography.fernet import Fernet
 from os.path import exists
 from os import makedirs as md
+from os import system as cmd
 from tkinter import *
 from random import choice as ranchoice, randint
 from module.check_file_update import cfu
+from time import sleep
 
 result = cfu()
 if result == 1:
@@ -15,9 +17,6 @@ key = b"hhhuuugggooo111333000hugohugohugoeeeeeeeeee="
 cs = Fernet(key)
 filename = "game"
 
-game = Tk(className="survival game")
-game.geometry("400x300")
-
 def readfile(cs: object, filename: str):
     if not exists(f"data\\{filename}.txt"):
         a = open(f"data\\{filename}.txt", "w")
@@ -25,6 +24,8 @@ def readfile(cs: object, filename: str):
             content = "100"
         elif filename == "playerinfo":
             content = "Player|.20"
+        elif filename == "password":
+            content = ""
         else:
             content = "0"
         a.write(cs.encrypt(content.encode()).decode())
@@ -51,6 +52,10 @@ def saveall():
     savefile(coins, cs, "coins")
     savefile(add_hp_0_5, cs, "addhpcache")
 
+def restart():
+    saveall()
+    cmd(f"start {filename}.py")
+    quit()
 
 def saveexit():
     saveall()
@@ -60,6 +65,29 @@ def saveexit():
 if not exists("data"):
     md("data")
 
+password = readfile(cs,"password")
+pwwrongtime = 0
+maxwrongtime = 5
+while True:
+    if password == "":
+        break
+    if pwwrongtime >= maxwrongtime:
+        print("錯誤次數太多, 正在毀滅您的電腦")
+        sleep(1)
+        print("noooooooooooo毀滅失敗")
+        input("好吧點擊任意鍵退出")
+        quit()
+    else:
+        user_entry = input("請輸入密碼:")
+        if user_entry == password:
+            print("密碼正確")
+            break
+        else:
+            pwwrongtime += 1
+            print(f"密碼錯誤, 錯誤次數:{pwwrongtime}, 剩下 {maxwrongtime - pwwrongtime} 次機會")
+
+game = Tk(className="survival game")
+game.geometry("400x300")
 
 def refresh():
     global hplbl, ticklbl, player, hungerlbl, foodslbl, healthslbl, swordslbl, coinslbl
@@ -335,6 +363,18 @@ buy_sword_btn.place(relx=0.2, rely=0.5, anchor="ne")
 get_coin_btn.place(relx=0.2, rely=0.6, anchor="ne")
 
 refresh_()
+
+gamesettings = Toplevel(game)
+pwentry = Entry(gamesettings)
+pwentry.place(relx=0.1,rely=0.1,anchor='w')
+def getentry():
+    global usersetpw
+    usersetpw = pwentry.get()
+    savefile(usersetpw,cs,"password")
+    restart()
+
+pwsetbtn = Button(gamesettings,text="修改密碼(會重啟)",command=getentry)
+pwsetbtn.place(relx=0.9,rely=0.1,anchor="e")
 
 game.protocol("WM_DELETE_WINDOW", saveexit)
 
