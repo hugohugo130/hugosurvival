@@ -7,8 +7,10 @@ from random import choice as ranchoice, randint
 from module.check_file_update import cfu
 from time import sleep
 
+dev = False
+
 result = cfu()
-if result == 1:
+if result == 1 and not dev:
     print("檢測到更新!請執行game_file_updater_get.py去更新哦~")
     input("點擊Enter退出")
     quit()
@@ -362,19 +364,23 @@ buy_health_btn.place(relx=0.2, rely=0.4, anchor="ne")
 buy_sword_btn.place(relx=0.2, rely=0.5, anchor="ne")
 get_coin_btn.place(relx=0.2, rely=0.6, anchor="ne")
 
+def opengamesettings():
+    gamesettings = Toplevel(game)
+    gamesettings.geometry("400x300")
+    pwentry = Entry(gamesettings)
+    pwentry.place(relx=0.1,rely=0.1,anchor='w')
+    def getentry():
+        global usersetpw
+        usersetpw = pwentry.get()
+        savefile(usersetpw,cs,"password")
+        restart()
+    pwsetbtn = Button(gamesettings,text="設定密碼 (會重啟) (留空清除密碼)",command=getentry)
+    pwsetbtn.place(relx=0.9,rely=0.1,anchor="e")
+
+opengamesettings_btn = Button(game,text="打開遊戲設定",command=opengamesettings)
+opengamesettings_btn.place(relx=0.22,rely=0.7,anchor="ne")
+
 refresh_()
-
-gamesettings = Toplevel(game)
-pwentry = Entry(gamesettings)
-pwentry.place(relx=0.1,rely=0.1,anchor='w')
-def getentry():
-    global usersetpw
-    usersetpw = pwentry.get()
-    savefile(usersetpw,cs,"password")
-    restart()
-
-pwsetbtn = Button(gamesettings,text="修改密碼(會重啟)",command=getentry)
-pwsetbtn.place(relx=0.9,rely=0.1,anchor="e")
 
 game.protocol("WM_DELETE_WINDOW", saveexit)
 
