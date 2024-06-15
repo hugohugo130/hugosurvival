@@ -1,10 +1,15 @@
 from cryptography.fernet import Fernet
 from os.path import exists
 from os import makedirs as md
-from os import system as cmd
 from tkinter import *
 from random import choice as ranchoice, randint
 from module.check_file_update import cfu
+
+result = cfu()
+if result == 1:
+    print("已經有更新了!請打開game_file_updater_get.py更新!")
+    input("點擊Enter退出")
+    quit()
 
 key = b"hhhuuugggooo111333000hugohugohugoeeeeeeeeee="
 cipher_suite = Fernet(key)
@@ -12,11 +17,6 @@ filename = "game"
 
 game = Tk(className="survival game")
 game.geometry("400x300")
-
-if cfu() == 1:
-    print("已經有更新了!請打開game_file_updater_get.py更新!")
-    input("點擊Enter退出")
-    quit()
 
 def readfile(cs: object, filename: str):
     if not exists(f"data\\{filename}.txt"):
