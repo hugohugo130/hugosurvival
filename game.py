@@ -5,7 +5,11 @@ from os import system as cmd
 from tkinter import *
 from random import choice as ranchoice, randint
 from module.check_file_update import cfu
-from time import sleep
+from time import sleep as slp
+from signal import CTRL_C_EVENT as k
+from os import kill
+from subprocess import check_output
+import psutil
 
 checkupdate = True
 
@@ -18,6 +22,7 @@ if result == 1 and checkupdate:
 key = b"hhhuuugggooo111333000hugohugohugoeeeeeeeeee="
 cs = Fernet(key)
 filename = "game"
+
 
 def readfile(cs: object, filename: str):
     if not exists(f"data\\{filename}.txt"):
@@ -54,10 +59,12 @@ def saveall():
     savefile(coins, cs, "coins")
     savefile(add_hp_0_5, cs, "addhpcache")
 
+
 def restart():
     saveall()
     cmd(f"start {filename}.py")
     quit()
+
 
 def saveexit():
     saveall()
@@ -67,7 +74,7 @@ def saveexit():
 if not exists("data"):
     md("data")
 
-password = readfile(cs,"password")
+password = readfile(cs, "password")
 pwwrongtime = 0
 maxwrongtime = 5
 while True:
@@ -75,7 +82,7 @@ while True:
         break
     if pwwrongtime >= maxwrongtime:
         print("錯誤次數太多, 正在毀滅您的電腦")
-        sleep(1)
+        slp(1)
         print("noooooooooooo毀滅失敗")
         input("好吧點擊任意鍵退出")
         quit()
@@ -86,10 +93,13 @@ while True:
             break
         else:
             pwwrongtime += 1
-            print(f"密碼錯誤, 錯誤次數:{pwwrongtime}, 剩下 {maxwrongtime - pwwrongtime} 次機會")
+            print(
+                f"密碼錯誤, 錯誤次數:{pwwrongtime}, 剩下 {maxwrongtime - pwwrongtime} 次機會"
+            )
 
 game = Tk(className="生存遊戲")
 game.geometry("400x300")
+
 
 def refresh():
     global hplbl, ticklbl, player, hungerlbl, foodslbl, healthslbl, swordslbl, coinslbl
@@ -122,11 +132,12 @@ def refresh():
     player.health = hp
     player.hunger = hunger
 
+
 try:
     hp = int(readfile(cs, "hp"))
     tick = int(readfile(cs, "tick"))
     coins = int(readfile(cs, "coins"))
-    add_hp_0_5 = int(readfile(cs,"addhpcache"))
+    add_hp_0_5 = int(readfile(cs, "addhpcache"))
 except Exception as err:
     if "ValueError" in err:
         quit("data數據出錯,解決辦法: 刪掉txt\n {err}")
@@ -157,7 +168,7 @@ class monster:
         print(f"怪物{self.name} 生成了!")
 
     def attack(self, player):
-        global hp,add_hp_0_5
+        global hp, add_hp_0_5
         if self.health <= 0 and self in zombies:
             zombies.remove(self)
             print(f"怪物{self.name} 死了!")
@@ -226,8 +237,9 @@ print(f"{player.name}的飢餓值: {player.hunger}")
 
 add_hp_0_5 = 0
 
+
 def refresh_():
-    global tick, hp, zombies, player, hunger,add_hp_0_5
+    global tick, hp, zombies, player, hunger, add_hp_0_5
     tick += 1
     if add_hp_0_5 >= 2:
         add_hp_0_5 -= 2
@@ -259,7 +271,7 @@ def refresh_():
         print("你復活了")
     if len(zombies) == 0 and not (4 <= hours < 20):
         for i in range(3):
-            exec(f"zombie{i} = 怪物zombie{i}")
+            exec(f"zombie{i} = monster('zombie{i}')")
             exec(f"zombies.append(zombie{i})")
     if tick % 100 == 0:
         if 4 < hours < 20 and hp < 100:
@@ -301,7 +313,7 @@ def eat_food():
 
 
 def skip_night():
-    global tick,hunger
+    global tick, hunger
     mins = int(tick * 0.06)
     hours = 0
     days = 0
@@ -345,19 +357,11 @@ def buy(obj):
             print("5個金幣 = 1個攻擊加成")
 
 
-def buy_():
-    buy("h")
-
-
-def buy__():
-    buy("s")
-
-
 eat_food_btn = Button(game, text="吃掉食物", command=eat_food)
 get_food_btn = Button(game, text="獲取食物", command=get_food)
 skip_night_btn = Button(game, text="跳過晚上", command=skip_night)
-buy_health_btn = Button(game, text="購買回血加成", command=buy_)
-buy_sword_btn = Button(game, text="購買攻擊加成", command=buy__)
+buy_health_btn = Button(game, text="購買回血加成", command=lambda: buy("h"))
+buy_sword_btn = Button(game, text="購買攻擊加成", command=lambda: buy("s"))
 get_coin_btn = Button(game, text="獲取金幣", command=get_coin)
 eat_food_btn.place(relx=0.2, rely=0.1, anchor="ne")
 get_food_btn.place(relx=0.2, rely=0.2, anchor="ne")
@@ -366,22 +370,70 @@ buy_health_btn.place(relx=0.22, rely=0.4, anchor="ne")
 buy_sword_btn.place(relx=0.22, rely=0.5, anchor="ne")
 get_coin_btn.place(relx=0.2, rely=0.6, anchor="ne")
 
+
 def opengamesettings():
     gamesettings = Toplevel(game)
     gamesettings.title("遊戲設定")
     gamesettings.geometry("400x300")
     pwentry = Entry(gamesettings)
-    pwentry.place(relx=0.05,rely=0.1,anchor='w')
+    pwentry.place(relx=0.05, rely=0.1, anchor="w")
+
     def getentry():
         global usersetpw
         usersetpw = pwentry.get()
-        savefile(usersetpw,cs,"password")
+        savefile(usersetpw, cs, "password")
         restart()
-    pwsetbtn = Button(gamesettings,text="設定密碼 (會重啟) (留空清除密碼)",command=getentry)
-    pwsetbtn.place(relx=0.95,rely=0.1,anchor="e")
 
-opengamesettings_btn = Button(game,text="打開遊戲設定",command=opengamesettings)
-opengamesettings_btn.place(relx=0.22,rely=0.7,anchor="ne")
+    pwsetbtn = Button(
+        gamesettings, text="設定密碼 (會重啟) (留空清除密碼)", command=getentry
+    )
+    pwsetbtn.place(relx=0.95, rely=0.1, anchor="e")
+
+
+opengamesettings_btn = Button(game, text="打開遊戲設定", command=opengamesettings)
+opengamesettings_btn.place(relx=0.22, rely=0.7, anchor="ne")
+
+canplay = False
+
+def download_xiaozitv_live():
+    global canplay  
+    cmd(f"start d_live.py")
+    slp(5)
+    canplay = True
+
+
+def stopdownload():
+    global canplay
+    for proc in psutil.process_iter():
+        if "streamlink" in proc.name():
+            kill(proc.pid, k)
+            canplay = False
+            break
+    
+
+def playxiaozilive():
+    if canplay:
+        cmd("start play_xiaozi_live.py")
+
+def openxiaozitv():
+    xiaozitv = Toplevel(game)
+    xiaozitv.title("xiaozi tv")
+    xiaozitv.geometry("500x400")
+    download_xiaozitv_live_btn = Button(
+        xiaozitv, text="下載直播(方可播放)", command=download_xiaozitv_live
+    )
+    stop_download_xiaozitv_live_btn = Button(
+        xiaozitv,text="停止下載直播",command=stopdownload
+    )
+    play_btn = Button(
+        xiaozitv,text="播放",command=playxiaozilive
+    )
+    download_xiaozitv_live_btn.pack()
+    stop_download_xiaozitv_live_btn.pack()
+    play_btn.pack()
+
+openxiaozitv_btn = Button(game,text="打開XiaoziTV直播",command=openxiaozitv)
+openxiaozitv_btn.place(relx=0.3,rely=0.8,anchor="ne")
 
 refresh_()
 
