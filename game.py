@@ -370,7 +370,6 @@ buy_health_btn.place(relx=0.22, rely=0.4, anchor="ne")
 buy_sword_btn.place(relx=0.22, rely=0.5, anchor="ne")
 get_coin_btn.place(relx=0.2, rely=0.6, anchor="ne")
 
-
 def opengamesettings():
     gamesettings = Toplevel(game)
     gamesettings.title("遊戲設定")
@@ -384,10 +383,9 @@ def opengamesettings():
         savefile(usersetpw, cs, "password")
         restart()
 
-    pwsetbtn = Button(
+    Button(
         gamesettings, text="設定密碼 (會重啟) (留空清除密碼)", command=getentry
-    )
-    pwsetbtn.place(relx=0.95, rely=0.1, anchor="e")
+    ).place(relx=0.95, rely=0.1, anchor="e")
 
 
 opengamesettings_btn = Button(game, text="打開遊戲設定", command=opengamesettings)
