@@ -395,8 +395,9 @@ opengamesettings_btn.place(relx=0.22, rely=0.7, anchor="ne")
 
 canplay = False
 
+
 def download_xiaozitv_live():
-    global canplay  
+    global canplay
     cmd(f"start d_live.py")
     slp(5)
     canplay = True
@@ -409,31 +410,24 @@ def stopdownload():
             kill(proc.pid, k)
             canplay = False
             break
-    
+
 
 def playxiaozilive():
     if canplay:
         cmd("start play_xiaozi_live.py")
 
+
 def openxiaozitv():
     xiaozitv = Toplevel(game)
     xiaozitv.title("xiaozi tv")
     xiaozitv.geometry("500x400")
-    download_xiaozitv_live_btn = Button(
-        xiaozitv, text="下載直播(方可播放)", command=download_xiaozitv_live
-    )
-    stop_download_xiaozitv_live_btn = Button(
-        xiaozitv,text="停止下載直播",command=stopdownload
-    )
-    play_btn = Button(
-        xiaozitv,text="播放",command=playxiaozilive
-    )
-    download_xiaozitv_live_btn.pack()
-    stop_download_xiaozitv_live_btn.pack()
-    play_btn.pack()
+    Button(xiaozitv, text="下載直播(方可播放)", command=download_xiaozitv_live).pack()
+    Button(xiaozitv, text="停止下載直播", command=stopdownload).pack()
+    Button(xiaozitv, text="播放", command=playxiaozilive).pack()
 
-openxiaozitv_btn = Button(game,text="打開XiaoziTV直播",command=openxiaozitv)
-openxiaozitv_btn.place(relx=0.3,rely=0.8,anchor="ne")
+
+openxiaozitv_btn = Button(game, text="打開XiaoziTV直播", command=openxiaozitv)
+openxiaozitv_btn.place(relx=0.3, rely=0.8, anchor="ne")
 
 refresh_()
 
