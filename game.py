@@ -8,7 +8,6 @@ from module.check_file_update import cfu
 from time import sleep as slp
 from signal import CTRL_C_EVENT as k
 from os import kill
-from subprocess import check_output
 import psutil
 
 checkupdate = True
@@ -369,6 +368,7 @@ skip_night_btn.place(relx=0.2, rely=0.3, anchor="ne")
 buy_health_btn.place(relx=0.22, rely=0.4, anchor="ne")
 buy_sword_btn.place(relx=0.22, rely=0.5, anchor="ne")
 get_coin_btn.place(relx=0.2, rely=0.6, anchor="ne")
+
 
 def opengamesettings():
     gamesettings = Toplevel(game)
