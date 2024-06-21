@@ -16,7 +16,7 @@ for curfilename in filename:
     repo = git.get_repo(link)
     content = repo.get_contents(curfilename)
     latestfile = content.decoded_content
-    if not exists(curfilename):
+    if not exists(curfilename if 3 < filename.index(curfilename) < 7 else "module\\" + curfilename):
         result = 2
     else:
         with open(curfilename,"rb") as gamefile:
