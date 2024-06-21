@@ -414,7 +414,6 @@ def download_xiaozitv_live():
                 return
     canplay = True
 
-
 def stopdownload():
     global canplay
     for proc in psutil.process_iter():
