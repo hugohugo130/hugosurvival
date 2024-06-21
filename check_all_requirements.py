@@ -10,4 +10,10 @@ def run():
             exec(f"import {req}")
         except ImportError:
             print(f"模塊{req}不存在，正在為您安裝...")
-            cmd(sys.executable + " -m pip install {curreq}")
+            if req == "vlc":
+                curreq = "python-vlc"
+            elif req == "github":
+                curreq = "PyGithub"
+            else:
+                curreq = req
+            cmd(sys.executable + f" -m pip install {curreq}")
