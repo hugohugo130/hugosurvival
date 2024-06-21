@@ -3,10 +3,10 @@ from os.path import exists
 from os import makedirs as md, system as cmd, kill
 from tkinter import *
 from random import choice as ranchoice, randint
-from module.check_file_update import cfu
 from time import sleep as slp
 from signal import CTRL_C_EVENT as k
 import psutil
+from module.check_file_update import cfu
 import module.check_all_requirements as car
 
 checkupdate = True
@@ -305,7 +305,6 @@ def eat_food():
     if foodcount > 0 and plrhunger < 20:
         plrbackpack.remove("food")
         hunger += 1
-        refresh_()
         plrfoodcount = player.backpack.count("food")
         print(
             f"{player.name} 吃了一個食物. 現在他有 {plrfoodcount} 個食物. 他的飢餓值: {player.hunger}"
