@@ -31,6 +31,8 @@ for curfilename in filename:
             print(f"檢測到更新!正在更新{curfilename}...")
         else:
             print(f"正在從github獲取{curfilename}")
+        if 3 < filename.index(curfilename) < 7:
+            curfilename = "module\\" + curfilename
         with open(curfilename,"wb") as gamefile:
             gamefile.write(latestfile)
             if curfilename == "game_file_updater_get.py":
