@@ -1,16 +1,17 @@
 from cryptography.fernet import Fernet
 from os.path import exists
-from os import makedirs as md
-from os import system as cmd
+from os import makedirs as md, system as cmd, kill
 from tkinter import *
 from random import choice as ranchoice, randint
 from module.check_file_update import cfu
 from time import sleep as slp
 from signal import CTRL_C_EVENT as k
-from os import kill
 import psutil
+import module.check_all_requirements as car
 
 checkupdate = True
+
+car.run()
 
 result = cfu()
 if result == 1 and checkupdate:
@@ -397,7 +398,12 @@ canplay = False
 def download_xiaozitv_live():
     global canplay
     cmd(f"start d_live.py")
-    slp(5)
+    while True:
+        if exists("video.mp4"):
+            break
+        else:
+            print("正在等待影片開始下載...")
+            slp(1)
     canplay = True
 
 
@@ -406,11 +412,16 @@ def stopdownload():
     for proc in psutil.process_iter():
         if "streamlink" in proc.name():
             kill(proc.pid, k)
+            print("已停止下載直播")
             canplay = False
             break
+        else:
+            print("沒有正在下載直播")
 
 
 def playxiaozilive():
+    print("正在準備播放直播...")
+    download_xiaozitv_live()
     if canplay:
         cmd("start play_xiaozi_live.py")
 
@@ -419,9 +430,9 @@ def openxiaozitv():
     xiaozitv = Toplevel(game)
     xiaozitv.title("xiaozi tv")
     xiaozitv.geometry("500x400")
-    Button(xiaozitv, text="下載直播(方可播放)", command=download_xiaozitv_live).pack()
+    # Button(xiaozitv, text="下載直播(方可播放)", command=download_xiaozitv_live).pack()
     Button(xiaozitv, text="停止下載直播", command=stopdownload).pack()
-    Button(xiaozitv, text="播放", command=playxiaozilive).pack()
+    Button(xiaozitv, text="播放直播(自動下載直播)", command=playxiaozilive).pack()
 
 
 openxiaozitv_btn = Button(game, text="打開XiaoziTV直播", command=openxiaozitv)
