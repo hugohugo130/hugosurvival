@@ -401,8 +401,17 @@ def download_xiaozitv_live():
         if exists("video.mp4"):
             break
         else:
-            print("正在等待影片開始下載...")
-            slp(1)
+            a = None
+            for proc in psutil.process_iter():
+                if "streamlink" in proc.name():
+                    a = True
+                    break
+            if a:
+                print("正在等待影片開始下載...")
+                slp(1)
+            else:
+                print("影片沒有準備下載,已停止播放")
+                return
     canplay = True
 
 
