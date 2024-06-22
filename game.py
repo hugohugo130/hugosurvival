@@ -506,8 +506,11 @@ def stopdownload():
             kill(proc.pid, k)
             print(lang.stoppeddlive)
             canplay = False
+            open("stopplay.txt","w").close()
+            slp(1)
             break
         else:
+            slp(1)
             print(lang.notdlive)
 
 
@@ -518,12 +521,6 @@ def playxiaozilive():
         print(lang.cannotusecmd)
         return
     elif canplay:
-        print(
-            "直播播放後請在有類似",
-            "[000002786bd8d920] mpeg4audio packetizer: AAC channels: 2 samplerate: 44100",
-            "[000002786bd1e2a0] avcodec decoder: Using D3D11VA (Intel(R) Iris(R) Xe Graphics, vendor 8086(Intel), device 46a8, revision c) for hardware decoding",
-            "的窗口按Ctrl+C結束播放",
-        )
         cmd("start play_xiaozi_live.py")
 
 
