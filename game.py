@@ -12,28 +12,25 @@ import configparser
 
 if not exists("config.ini"):
     while True:
-        user_checkupdate = input("是否檢查遊戲更新?\n是否检查游戏更新?\n(1 = 是, 0 = 否)\n")
-        if any(user_checkupdate in i for i in ["1","0"]):
+        user_checkupdate = input(
+            "是否檢查遊戲更新?\n是否检查游戏更新?\n(1 = 是, 0 = 否)\n"
+        )
+        if any(user_checkupdate in i for i in ["1", "0"]):
             break
         else:
             print("請輸入 请输入 1或0!")
     while True:
-        user_cuosf = input("此環境是否可以使用os.system功能?\n此环境是否可以使用os.system功能?\n(1 = 是, 0 = 否)\n")
-        if any(user_cuosf in i for i in ["1","0"]):
+        user_cuosf = input(
+            "此環境是否可以使用os.system功能?\n此环境是否可以使用os.system功能?\n(1 = 是, 0 = 否)\n"
+        )
+        if any(user_cuosf in i for i in ["1", "0"]):
             break
         else:
             print("請輸入 请输入 1或0!")
-    while True:
-        user_lang = input("請選擇語言\n请选择语言\ntc = 繁體中文\nsc = 简体中文\n")
-        if any(user_lang in i for i in["tc","sc"]):
-            break
-        else:
-            print("請輸入 请输入 tc或sc!")
     gameconfig = configparser.ConfigParser()
     gameconfig["CONFIG"] = {}
     gameconfig["CONFIG"]["checkupdate"] = user_checkupdate
     gameconfig["CONFIG"]["cuosf"] = user_cuosf
-    gameconfig["CONFIG"]["lang"] = user_lang
     with open("config.ini", "w") as cf:
         gameconfig.write(cf)
 
@@ -41,7 +38,6 @@ config = configparser.ConfigParser()
 config.read("config.ini")
 cu = config["CONFIG"]["checkupdate"]
 cuosf = config["CONFIG"]["cuosf"]
-langchoose = config["CONFIG"]["lang"]
 if cu == "1":
     checkupdate = True
 else:
@@ -50,10 +46,6 @@ if cuosf == "1":
     can_use_os_system_function = True
 else:
     can_use_os_system_function = False
-if langchoose == "sc":
-    import lang.sc as lang
-else:
-    import lang.tc as lang
 
 # checkupdate = True
 
@@ -81,6 +73,8 @@ def readfile(cs: object, filename: str):
             content = "Player|.20"
         elif filename == "password":
             content = ""
+        elif filename == "langchoose":
+            content = "tc"
         else:
             content = "0"
         a.write(cs.encrypt(content.encode()).decode())
@@ -124,6 +118,12 @@ def saveexit():
 
 if not exists("data"):
     md("data")
+
+langchoose = readfile(cs, "langchoose")
+if langchoose == "sc":
+    import lang.sc as lang
+else:
+    import lang.tc as lang
 
 password = readfile(cs, "password")
 pwwrongtime = 0
@@ -226,7 +226,9 @@ class monster:
         else:
             # print(f"{self.name} want to attack {player.name}! -- monster attack function")
             if randint(1, 2) == 1:
-                print(f"{player.name}{lang.evade}{lang.zombie}{self.name}{lang.success}!")
+                print(
+                    f"{player.name}{lang.evade}{lang.zombie}{self.name}{lang.success}!"
+                )
             else:
                 print(
                     f"{player.name}{lang.evade}{lang.zombie}{self.name}{lang.failed}，{lang.zombie}{self.name}{lang.attacking[2:]}!"
@@ -252,7 +254,9 @@ class monster:
                             f"{player.name} {lang.used} {plrsword} {lang.swordtoattack}{lang.zombie}{self.name}. {lang.zombie}{lang.health} - {monster_health_reduce}"
                         )
                         add_hp_0_5 += 1
-                        print(f"{player.name}{lang.s} 0.5 hp + 1 ({lang.two0_5hpto1hp})")
+                        print(
+                            f"{player.name}{lang.s} 0.5 hp + 1 ({lang.two0_5hpto1hp})"
+                        )
                         if self.health - monster_health_reduce <= 0:
                             self.health = 0
                             if self in zombies:
@@ -434,6 +438,8 @@ def opengamesettings():
     gamesettings.geometry("400x300")
     pwentry = Entry(gamesettings)
     pwentry.place(relx=0.05, rely=0.1, anchor="w")
+    languageshowlbl = Label(gamesettings, text=f"{lang.curlanguage}: {langchoose}")
+    languageshowlbl.place(relx=0.1, rely=0.2, anchor="w")
 
     def getentry():
         global usersetpw
@@ -441,12 +447,25 @@ def opengamesettings():
         savefile(usersetpw, cs, "password")
         restart()
 
-    Button(
-        gamesettings, text=lang.resetpw, command=getentry
-    ).place(relx=0.95, rely=0.1, anchor="e")
+    def changelanguage():
+        if langchoose == "sc":
+            savefile("tc", cs, "langchoose")
+        else:
+            savefile("sc", cs, "langchoose")
+        restart()
+
+    Button(gamesettings, text=lang.resetpw, command=getentry).place(
+        relx=0.95, rely=0.1, anchor="e"
+    )
+    
+    Button(gamesettings, text=lang.changelang, command=changelanguage).place(
+        relx=0.95, rely=0.2, anchor="e"
+    )
 
 
-opengamesettings_btn = Button(game, text=lang.opengamesettings, command=opengamesettings)
+opengamesettings_btn = Button(
+    game, text=lang.opengamesettings, command=opengamesettings
+)
 opengamesettings_btn.place(relx=0.22, rely=0.7, anchor="ne")
 
 canplay = False
@@ -499,10 +518,12 @@ def playxiaozilive():
         print(lang.cannotusecmd)
         return
     elif canplay:
-        print("直播播放後請在有類似",
-              "[000002786bd8d920] mpeg4audio packetizer: AAC channels: 2 samplerate: 44100",
-              "[000002786bd1e2a0] avcodec decoder: Using D3D11VA (Intel(R) Iris(R) Xe Graphics, vendor 8086(Intel), device 46a8, revision c) for hardware decoding",
-              "的窗口按Ctrl+C結束播放")
+        print(
+            "直播播放後請在有類似",
+            "[000002786bd8d920] mpeg4audio packetizer: AAC channels: 2 samplerate: 44100",
+            "[000002786bd1e2a0] avcodec decoder: Using D3D11VA (Intel(R) Iris(R) Xe Graphics, vendor 8086(Intel), device 46a8, revision c) for hardware decoding",
+            "的窗口按Ctrl+C結束播放",
+        )
         cmd("start play_xiaozi_live.py")
 
 
