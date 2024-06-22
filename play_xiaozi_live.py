@@ -1,9 +1,6 @@
-# importing vlc module
 import vlc
-
-# importing time module
 import time
-
+from os.path import exists
 
 # creating vlc media player object
 media_player = vlc.MediaPlayer()
@@ -19,4 +16,5 @@ media_player.set_media(media)
 media_player.play()
 
 while True:
-    time.sleep(1)
+    if not exists("stopplay.txt"):
+        time.sleep(1)
