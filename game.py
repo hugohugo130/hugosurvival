@@ -457,7 +457,11 @@ def download_xiaozitv_live():
     if not can_use_os_system_function:
         print(lang.cannotusecmd)
         return
-    cmd(f"start d_live.py")
+    if exists("video.mp4"):
+        cmd(f"start d_live.py")
+        while True:
+            if not exists("video.mp4"):
+                break
     while True:
         if exists("video.mp4"):
             break
