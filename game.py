@@ -12,21 +12,28 @@ import configparser
 
 if not exists("config.ini"):
     while True:
-        user_checkupdate = input("是否檢查更新? (1 = 是, 0 = 否)")
+        user_checkupdate = input("是否檢查遊戲更新?\n是否检查游戏更新?\n(1 = 是, 0 = 否)\n")
         if any(user_checkupdate in i for i in ["1","0"]):
             break
         else:
-            print("請輸入1或0!")
+            print("請輸入 请输入 1或0!")
     while True:
-        user_cuosf = input("此環境是否可以使用os.system功能? (1 = 是, 0 = 否)")
+        user_cuosf = input("此環境是否可以使用os.system功能?\n此环境是否可以使用os.system功能?\n(1 = 是, 0 = 否)\n")
         if any(user_cuosf in i for i in ["1","0"]):
             break
         else:
-            print("請輸入1或0!")
+            print("請輸入 请输入 1或0!")
+    while True:
+        user_lang = input("請選擇語言\n请选择语言\ntc = 繁體中文\nsc = 简体中文\n")
+        if any(user_lang in i for i in["tc","sc"]):
+            break
+        else:
+            print("請輸入 请输入 tc或sc!")
     gameconfig = configparser.ConfigParser()
     gameconfig["CONFIG"] = {}
     gameconfig["CONFIG"]["checkupdate"] = user_checkupdate
     gameconfig["CONFIG"]["cuosf"] = user_cuosf
+    gameconfig["CONFIG"]["lang"] = user_lang
     with open("config.ini", "w") as cf:
         gameconfig.write(cf)
 
@@ -34,6 +41,7 @@ config = configparser.ConfigParser()
 config.read("config.ini")
 cu = config["CONFIG"]["checkupdate"]
 cuosf = config["CONFIG"]["cuosf"]
+langchoose = config["CONFIG"]["lang"]
 if cu == "1":
     checkupdate = True
 else:
@@ -42,6 +50,10 @@ if cuosf == "1":
     can_use_os_system_function = True
 else:
     can_use_os_system_function = False
+if langchoose == "sc":
+    import lang.sc as lang
+else:
+    import lang.tc as lang
 
 # checkupdate = True
 
@@ -51,8 +63,8 @@ car.run()
 
 result = cfu()
 if result == 1 and checkupdate:
-    print("檢測到更新!請執行game_file_updater_get.py去更新哦~")
-    input("點擊Enter退出")
+    print(lang.cfu1)
+    input(lang.pressentertoquit)
     quit()
 
 key = b"hhhuuugggooo111333000hugohugohugoeeeeeeeeee="
@@ -99,7 +111,7 @@ def saveall():
 def restart():
     saveall()
     if not can_use_os_system_function:
-        print("由於無法使用os.system功能,無法重啟,請手動重啟!!")
+        print(f"{lang.cannotusecmd},{lang.plsrestartself}!!")
         return
     cmd(f"start {filename}.py")
     quit()
@@ -120,23 +132,23 @@ while True:
     if password == "":
         break
     if pwwrongtime >= maxwrongtime:
-        print("錯誤次數太多, 正在毀滅您的電腦")
+        print({lang.errtoomanydestroyingpc})
         slp(1)
-        print("noooooooooooo毀滅失敗")
-        input("好吧點擊任意鍵退出")
+        print(f"noooooooooooo{lang.destoryfailed}")
+        input(lang.okpressenterexit)
         quit()
     else:
-        user_entry = input("請輸入密碼:")
+        user_entry = input(lang.pleaseenterpw)
         if user_entry == password:
-            print("密碼正確")
+            print(lang.pwcorrect)
             break
         else:
             pwwrongtime += 1
             print(
-                f"密碼錯誤, 錯誤次數:{pwwrongtime}, 剩下 {maxwrongtime - pwwrongtime} 次機會"
+                f"{lang.pwerr}{pwwrongtime}, {lang.remain} {maxwrongtime - pwwrongtime} {lang.times}"
             )
 
-game = Tk(className="生存遊戲")
+game = Tk(className=lang.survivalgame)
 game.geometry("400x300")
 
 
@@ -161,13 +173,13 @@ def refresh():
     foods = player.backpack.count("food")
     healths = player.backpack.count("health")
     swords = player.backpack.count("sword")
-    hplbl.config(text=f"生命值: {hp}")
-    ticklbl.config(text=f"第 {days} 天 {hours}:{mins} ({tick} tick)")
-    hungerlbl.config(text=f"飢餓值: {hunger} / 20")
-    foodslbl.config(text=f"食物: {foods}")
-    healthslbl.config(text=f"回血加成: {healths}")
-    swordslbl.config(text=f"攻擊加成: {swords}")
-    coinslbl.config(text=f"金幣: {coins}")
+    hplbl.config(text=f"{lang.shealth[1:]}: {hp}")
+    ticklbl.config(text=f"{lang.day1} {days} {lang.day2} {hours}:{mins} ({tick} tick)")
+    hungerlbl.config(text=f"{lang.shunger[1:]}: {hunger} / 20")
+    foodslbl.config(text=f"{lang.food}: {foods}")
+    healthslbl.config(text=f"{lang.healthup}: {healths}")
+    swordslbl.config(text=f"{lang.attackup}: {swords}")
+    coinslbl.config(text=f"{lang.coins}: {coins}")
     player.health = hp
     player.hunger = hunger
 
@@ -179,17 +191,17 @@ try:
     add_hp_0_5 = int(readfile(cs, "addhpcache"))
 except Exception as err:
     if "ValueError" in err:
-        quit("data數據出錯,解決辦法: 刪掉txt\n {err}")
+        quit(f"{lang.dataerr}\n {err}")
     else:
         quit(err)
 
-hplbl = Label(game, text="生命值: Loading")
-ticklbl = Label(game, text="第 -- 天 --:-- (-- tick)")
-hungerlbl = Label(game, text="飢餓值: -- / 20")
-foodslbl = Label(game, text="食物: --")
-healthslbl = Label(game, text="回血加成: --")
-swordslbl = Label(game, text="攻擊加成: --")
-coinslbl = Label(game, text="金幣: --")
+hplbl = Label(game, text=f"生命值: Loading")
+ticklbl = Label(game, text=f"第 -- 天 --:-- (-- tick)")
+hungerlbl = Label(game, text=f"飢餓值: -- / 20")
+foodslbl = Label(game, text=f"食物: --")
+healthslbl = Label(game, text=f"{lang.healthup}: --")
+swordslbl = Label(game, text=f"{lang.attackup}: --")
+coinslbl = Label(game, text=f"{lang.coins}: --")
 hplbl.place(relx=0.5, rely=0.1, anchor="n")
 ticklbl.place(relx=0.5, rely=0.175, anchor="n")
 hungerlbl.place(relx=0.5, rely=0.250, anchor="n")
@@ -204,20 +216,20 @@ class monster:
         self.health = 10
         self.attackage = 1
         self.name = name
-        print(f"怪物{self.name} 生成了!")
+        print(f"{lang.zombie}{self.name} {lang.spawned}!")
 
     def attack(self, player):
         global hp, add_hp_0_5
         if self.health <= 0 and self in zombies:
             zombies.remove(self)
-            print(f"怪物{self.name} 死了!")
+            print(f"{lang.zombie}{self.name} {lang.udied[1:]}!")
         else:
             # print(f"{self.name} want to attack {player.name}! -- monster attack function")
             if randint(1, 2) == 1:
-                print(f"{player.name}躲避怪物{self.name}成功!")
+                print(f"{player.name}{lang.evade}{lang.zombie}{self.name}{lang.success}!")
             else:
                 print(
-                    f"{player.name}躲避怪物{self.name}失敗，正在被怪物{self.name}攻擊!"
+                    f"{player.name}{lang.evade}{lang.zombie}{self.name}{lang.failed}，{lang.zombie}{self.name}{lang.attacking[2:]}!"
                 )
                 mins = int(tick * 0.06)
                 hours = 0
@@ -230,22 +242,22 @@ class monster:
                     hours -= 24
                 # print(f"the hour is {hours}")
                 if (20 <= hours <= 24) or (0 <= hours <= 4):
-                    print(f"{self.name} 正在攻擊 {player.name}!")
+                    print(f"{self.name} {lang.attacking} {player.name}!")
                     hp -= self.attackage
-                    print(f"{player.name}的生命值 - {self.attackage}")
+                    print(f"{player.name}{lang.shealth} - {self.attackage}")
                     plrsword = player.backpack.count("sword")
                     if plrsword > 0:
                         monster_health_reduce = 5 * plrsword
                         print(
-                            f"{player.name} 用了 {plrsword} 個劍去打怪物{self.name}. 怪物血量 - {monster_health_reduce}"
+                            f"{player.name} {lang.used} {plrsword} {lang.swordtoattack}{lang.zombie}{self.name}. {lang.zombie}{lang.health} - {monster_health_reduce}"
                         )
                         add_hp_0_5 += 1
-                        print(f"{player.name}的 0.5 hp + 1 (達到2個自動增加1生命值)")
+                        print(f"{player.name}{lang.s} 0.5 hp + 1 ({lang.two0_5hpto1hp})")
                         if self.health - monster_health_reduce <= 0:
                             self.health = 0
                             if self in zombies:
                                 zombies.remove(self)
-                                print(f"怪物{self.name} 死了!")
+                                print(f"{lang.zombie}{self.name} {lang.udied[1:]}!")
                             del self
                         else:
                             self.health -= monster_health_reduce
@@ -275,10 +287,10 @@ player.name = playerinfo.split("|")[0]
 if len(playerinfo) > 1:
     player.backpack = playerinfo.split("|")[1].split(".")[0].split("-")
 hunger = int(playerinfo.split(".")[1])
-print(f"玩家 {player.name} 生成了!")
-print(f"{player.name}的背包 : {player.backpack}")
-print(f"{player.name}的生命值: {player.health}")
-print(f"{player.name}的飢餓值: {player.hunger}")
+print(f"{lang.player} {player.name} {lang.spawned}!")
+print(f"{player.name}{lang.sbackpack} : {player.backpack}")
+print(f"{player.name}{lang.shealth}: {player.health}")
+print(f"{player.name}{lang.shunger}: {player.hunger}")
 
 add_hp_0_5 = 0
 
@@ -289,7 +301,7 @@ def refresh_():
     if add_hp_0_5 >= 2:
         add_hp_0_5 -= 2
         hp += 1
-        print(f"{player.name}的生命值 + 1")
+        print(f"{player.name}{lang.shealth} + 1")
     refresh()
     mins = int(tick * 0.06)
     hours = 0
@@ -311,9 +323,9 @@ def refresh_():
             # print(f"{randomonezombie.name} want to attack {player.name}!")
             randomonezombie.attack(player)
     if player.health == 0:
-        print("你死了")
+        print(lang.udied)
         hp = 100
-        print("你復活了")
+        print(lang.urevive)
     if len(zombies) == 0 and not (4 <= hours < 20):
         for i in range(3):
             exec(f"zombie{i} = monster('zombie{i}')")
@@ -328,9 +340,9 @@ def refresh_():
                 hunger -= 1
                 addhp += 1
             hp += addhp
-            print(f"{player.name} 的生命值 + {addhp}")
+            print(f"{player.name} {lang.shealth} + {addhp}")
     if hp > 100:
-        print(f"{player.name} 太多生命值了 ({hp}), 設定成最大值 (100)")
+        print(f"{player.name}{lang.toomanyhealth}({hp}), {lang.settomax} (100)")
         hp = 100
     game.after(50, refresh_)
 
@@ -339,7 +351,7 @@ def get_food():
     global player
     player.backpack.append("food")
     plrfoodcount = player.backpack.count("food")
-    print(f"{player.name} 獲得了一個事物. 現在他有 {plrfoodcount} 個食物")
+    print(f"{player.name}{lang.gotfood1}{plrfoodcount}{lang.gotfood2}")
 
 
 def eat_food():
@@ -352,7 +364,7 @@ def eat_food():
         hunger += 1
         plrfoodcount = player.backpack.count("food")
         print(
-            f"{player.name} 吃了一個食物. 現在他有 {plrfoodcount} 個食物. 他的飢餓值: {player.hunger}"
+            f"{player.name}{lang.atefood1}{plrfoodcount}{lang.atefood2}{player.hunger}"
         )
 
 
@@ -376,13 +388,13 @@ def skip_night():
         tick += addtick
         reducehunger = randint(1, 5)
         hunger -= reducehunger
-        print(f"已跳過晚上, 飢餓值 - {reducehunger}")
+        print(f"{lang.skippednight}{reducehunger}")
 
 
 def get_coin():
     global coins
     coins += 1
-    print(f"金幣 + 1 (擁有金幣: {coins})")
+    print(f"{lang.coinsget}{coins})")
 
 
 def buy(obj):
@@ -392,21 +404,22 @@ def buy(obj):
             player.backpack.append("health")
             coins -= 5
         else:
-            print("5個金幣 = 1個回血加成")
+            print(lang.e5ceq1h)
     elif obj == "s":
         if coins >= 5:
             player.backpack.append("sword")
             coins -= 5
         else:
-            print("5個金幣 = 1個攻擊加成")
+            # print("5個{lang.coins} = 1個{lang.attackup}")
+            print(lang.e5ceq1s)
 
 
-eat_food_btn = Button(game, text="吃掉食物", command=eat_food)
-get_food_btn = Button(game, text="獲取食物", command=get_food)
-skip_night_btn = Button(game, text="跳過晚上", command=skip_night)
-buy_health_btn = Button(game, text="購買回血加成", command=lambda: buy("h"))
-buy_sword_btn = Button(game, text="購買攻擊加成", command=lambda: buy("s"))
-get_coin_btn = Button(game, text="獲取金幣", command=get_coin)
+eat_food_btn = Button(game, text=lang.eatfood, command=eat_food)
+get_food_btn = Button(game, text=lang.getfood, command=get_food)
+skip_night_btn = Button(game, text=lang.skipnight, command=skip_night)
+buy_health_btn = Button(game, text=lang.buyh, command=lambda: buy("h"))
+buy_sword_btn = Button(game, text=lang.buys, command=lambda: buy("s"))
+get_coin_btn = Button(game, text=lang.getcoin, command=get_coin)
 eat_food_btn.place(relx=0.2, rely=0.1, anchor="ne")
 get_food_btn.place(relx=0.2, rely=0.2, anchor="ne")
 skip_night_btn.place(relx=0.2, rely=0.3, anchor="ne")
@@ -417,7 +430,7 @@ get_coin_btn.place(relx=0.2, rely=0.6, anchor="ne")
 
 def opengamesettings():
     gamesettings = Toplevel(game)
-    gamesettings.title("遊戲設定")
+    gamesettings.title(lang.gamesettings)
     gamesettings.geometry("400x300")
     pwentry = Entry(gamesettings)
     pwentry.place(relx=0.05, rely=0.1, anchor="w")
@@ -429,11 +442,11 @@ def opengamesettings():
         restart()
 
     Button(
-        gamesettings, text="設定密碼 (會重啟) (留空清除密碼)", command=getentry
+        gamesettings, text=lang.resetpw, command=getentry
     ).place(relx=0.95, rely=0.1, anchor="e")
 
 
-opengamesettings_btn = Button(game, text="打開遊戲設定", command=opengamesettings)
+opengamesettings_btn = Button(game, text=lang.opengamesettings, command=opengamesettings)
 opengamesettings_btn.place(relx=0.22, rely=0.7, anchor="ne")
 
 canplay = False
@@ -442,7 +455,7 @@ canplay = False
 def download_xiaozitv_live():
     global canplay
     if not can_use_os_system_function:
-        print("由於無法使用os.system功能,無法重啟,請手動重啟!!")
+        print(lang.cannotusecmd)
         return
     cmd(f"start d_live.py")
     while True:
@@ -456,9 +469,9 @@ def download_xiaozitv_live():
                     a = True
                     break
             if a:
-                print("正在等待影片開始下載...")
+                print(lang.waitingvideod)
             else:
-                print("影片沒有準備下載,已停止播放")
+                print(lang.videonotd)
                 return
     canplay = True
 
@@ -468,18 +481,18 @@ def stopdownload():
     for proc in psutil.process_iter():
         if "streamlink" in proc.name():
             kill(proc.pid, k)
-            print("已停止下載直播")
+            print(lang.stoppeddlive)
             canplay = False
             break
         else:
-            print("沒有正在下載直播")
+            print(lang.notdlive)
 
 
 def playxiaozilive():
-    print("正在準備播放直播...")
+    print(lang.preparingplive)
     download_xiaozitv_live()
     if not can_use_os_system_function:
-        print("由於無法使用os.system功能,無法重啟,請手動重啟!!")
+        print(lang.cannotusecmd)
         return
     elif canplay:
         cmd("start play_xiaozi_live.py")
@@ -490,11 +503,11 @@ def openxiaozitv():
     xiaozitv.title("xiaozi tv")
     xiaozitv.geometry("500x400")
     # Button(xiaozitv, text="下載直播(方可播放)", command=download_xiaozitv_live).pack()
-    Button(xiaozitv, text="停止下載直播", command=stopdownload).pack()
-    Button(xiaozitv, text="播放直播(自動下載直播)", command=playxiaozilive).pack()
+    Button(xiaozitv, text=lang.stopdlive, command=stopdownload).pack()
+    Button(xiaozitv, text=lang.playlive, command=playxiaozilive).pack()
 
 
-openxiaozitv_btn = Button(game, text="打開XiaoziTV直播", command=openxiaozitv)
+openxiaozitv_btn = Button(game, text=lang.openxztvlive, command=openxiaozitv)
 openxiaozitv_btn.place(relx=0.24, rely=0.8, anchor="ne")
 
 refresh_()
