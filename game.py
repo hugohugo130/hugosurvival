@@ -508,7 +508,7 @@ def openxiaozitv():
 
 
 openxiaozitv_btn = Button(game, text=lang.openxztvlive, command=openxiaozitv)
-openxiaozitv_btn.place(relx=0.24, rely=0.8, anchor="ne")
+openxiaozitv_btn.place(relx=0.27, rely=0.8, anchor="ne")
 
 refresh_()
 
