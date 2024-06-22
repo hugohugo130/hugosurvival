@@ -8,8 +8,44 @@ from signal import CTRL_C_EVENT as k
 import psutil
 from module.check_file_update import cfu
 import module.check_all_requirements as car
+import configparser
 
-checkupdate = True
+if not exists("config.ini"):
+    while True:
+        user_checkupdate = input("是否檢查更新? (1 = 是, 0 = 否)")
+        if any(user_checkupdate in i for i in ["1","0"]):
+            break
+        else:
+            print("請輸入1或0!")
+    while True:
+        user_cuosf = input("此環境是否可以使用os.system功能? (1 = 是, 0 = 否)")
+        if any(user_cuosf in i for i in ["1","0"]):
+            break
+        else:
+            print("請輸入1或0!")
+    gameconfig = configparser.ConfigParser()
+    gameconfig["CONFIG"] = {}
+    gameconfig["CONFIG"]["checkupdate"] = user_checkupdate
+    gameconfig["CONFIG"]["cuosf"] = user_cuosf
+    with open("config.ini", "w") as cf:
+        gameconfig.write(cf)
+
+config = configparser.ConfigParser()
+config.read("config.ini")
+cu = config["CONFIG"]["checkupdate"]
+cuosf = config["CONFIG"]["cuosf"]
+if cu == "1":
+    checkupdate = True
+else:
+    checkupdate = False
+if cuosf == "1":
+    can_use_os_system_function = True
+else:
+    can_use_os_system_function = False
+
+# checkupdate = True
+
+# can_use_os_system_function = True
 
 car.run()
 
@@ -62,6 +98,9 @@ def saveall():
 
 def restart():
     saveall()
+    if not can_use_os_system_function:
+        print("由於無法使用os.system功能,無法重啟,請手動重啟!!")
+        return
     cmd(f"start {filename}.py")
     quit()
 
@@ -174,36 +213,42 @@ class monster:
             print(f"怪物{self.name} 死了!")
         else:
             # print(f"{self.name} want to attack {player.name}! -- monster attack function")
-            mins = int(tick * 0.06)
-            hours = 0
-            days = 0
-            while mins >= 60:
-                hours += 1
-                mins -= 60
-            while hours >= 24:
-                days += 1
-                hours -= 24
-            # print(f"the hour is {hours}")
-            if (20 <= hours <= 24) or (0 <= hours <= 4):
-                print(f"{self.name} 正在攻擊 {player.name}!")
-                hp -= self.attackage
-                print(f"{player.name}的生命值 - {self.attackage}")
-                plrsword = player.backpack.count("sword")
-                if plrsword > 0:
-                    monster_health_reduce = 5 * plrsword
-                    print(
-                        f"{player.name} 用了 {plrsword} 個劍去打怪物{self.name}. 怪物血量 - {monster_health_reduce}"
-                    )
-                    add_hp_0_5 += 1
-                    print("玩家的 0.5 hp + 1 (達到2個自動增加1生命值)")
-                    if self.health - monster_health_reduce <= 0:
-                        self.health = 0
-                        if self in zombies:
-                            zombies.remove(self)
-                            print(f"怪物{self.name} 死了!")
-                        del self
-                    else:
-                        self.health -= monster_health_reduce
+            if randint(1, 2) == 1:
+                print(f"{player.name}躲避怪物{self.name}成功!")
+            else:
+                print(
+                    f"{player.name}躲避怪物{self.name}失敗，正在被怪物{self.name}攻擊!"
+                )
+                mins = int(tick * 0.06)
+                hours = 0
+                days = 0
+                while mins >= 60:
+                    hours += 1
+                    mins -= 60
+                while hours >= 24:
+                    days += 1
+                    hours -= 24
+                # print(f"the hour is {hours}")
+                if (20 <= hours <= 24) or (0 <= hours <= 4):
+                    print(f"{self.name} 正在攻擊 {player.name}!")
+                    hp -= self.attackage
+                    print(f"{player.name}的生命值 - {self.attackage}")
+                    plrsword = player.backpack.count("sword")
+                    if plrsword > 0:
+                        monster_health_reduce = 5 * plrsword
+                        print(
+                            f"{player.name} 用了 {plrsword} 個劍去打怪物{self.name}. 怪物血量 - {monster_health_reduce}"
+                        )
+                        add_hp_0_5 += 1
+                        print(f"{player.name}的 0.5 hp + 1 (達到2個自動增加1生命值)")
+                        if self.health - monster_health_reduce <= 0:
+                            self.health = 0
+                            if self in zombies:
+                                zombies.remove(self)
+                                print(f"怪物{self.name} 死了!")
+                            del self
+                        else:
+                            self.health -= monster_health_reduce
 
 
 zombies = []
@@ -396,6 +441,9 @@ canplay = False
 
 def download_xiaozitv_live():
     global canplay
+    if not can_use_os_system_function:
+        print("由於無法使用os.system功能,無法重啟,請手動重啟!!")
+        return
     cmd(f"start d_live.py")
     while True:
         if exists("video.mp4"):
@@ -414,6 +462,7 @@ def download_xiaozitv_live():
                 return
     canplay = True
 
+
 def stopdownload():
     global canplay
     for proc in psutil.process_iter():
@@ -429,7 +478,10 @@ def stopdownload():
 def playxiaozilive():
     print("正在準備播放直播...")
     download_xiaozitv_live()
-    if canplay:
+    if not can_use_os_system_function:
+        print("由於無法使用os.system功能,無法重啟,請手動重啟!!")
+        return
+    elif canplay:
         cmd("start play_xiaozi_live.py")
 
 
@@ -443,7 +495,7 @@ def openxiaozitv():
 
 
 openxiaozitv_btn = Button(game, text="打開XiaoziTV直播", command=openxiaozitv)
-openxiaozitv_btn.place(relx=0.3, rely=0.8, anchor="ne")
+openxiaozitv_btn.place(relx=0.24, rely=0.8, anchor="ne")
 
 refresh_()
 
