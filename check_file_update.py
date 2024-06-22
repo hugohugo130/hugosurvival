@@ -3,7 +3,7 @@ def cfu(file="game.py"):
 
     link = "hugohugo130/hugosurvival"
     filename = "game.py"
-    git = g("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")
+    git = g()
     git = git.get_repo(link)
     git = git.get_contents(filename)
     latestfile = git.decoded_content
